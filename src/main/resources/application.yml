@@ -1,0 +1,41 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: post-service
+  data:
+    mongodb:
+      uri: mongodb://admin:admin123@localhost:27017/postservice?authSource=admin
+      database: postservice
+  jackson:
+    time-zone: GMT+08:00
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/myrealm
+
+# Distributed Tracing Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,tracing
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0  # Sample 100% of requests for development
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+# Logging configuration with automatic trace/span IDs
+logging:
+  level:
+    org.springframework.web: INFO
+    org.example.post: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [${spring.application.name:},%X{traceId:-},%X{spanId:-}] %logger{36} - %msg%n"
